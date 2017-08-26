@@ -17,25 +17,28 @@ public class TowerAim : MonoBehaviour {
 		bool isAiming = false;
 		Collider[] cols = Physics.OverlapSphere (transform.position, 5F);
 		Quaternion rot = transform.rotation;
+		GameObject aimObject = null;
 		foreach (Collider col in cols) {
 			GameObject g = col.gameObject;
-			if (g.tag == "Enemy"){
+			if (g != null && g.tag == "Enemy"){
 				isAiming = true;
 				Vector3 dir = (g.transform.position - this.transform.position);
 				Vector3 newDir = Vector3.RotateTowards (transform.forward, dir,1F,0.0F);
 				transform.rotation = Quaternion.LookRotation (newDir);
 				rot = transform.rotation;
 				transform.rotation = Quaternion.Euler (0, transform.rotation.eulerAngles.y, 0);
+				aimObject = g;
 			}
 		}
 		if (isAiming) {
 			cnt++;
 			if (cnt > 50) {
-				Instantiate (bul, transform.position, rot);
+				GameObject newBullet = Instantiate (bul, transform.position, transform.rotation);
+				newBullet.GetComponent<BulletMove> ().org = transform.position;
+				newBullet.GetComponent<BulletMove> ().dist = (transform.position - aimObject.transform.position).magnitude;
+				newBullet.GetComponent<BulletMove> ().enm = aimObject;
 				cnt = 0;
 			}
-		} else {
-			//cnt = 0;
 		}
 	}
 }
