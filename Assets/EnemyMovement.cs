@@ -5,8 +5,17 @@ using UnityEngine;
 public class EnemyMovement : MonoBehaviour {
 	// Use this for initialization
 	public GameObject goal;
+	[SerializeField]
+	public float health = 3F;
 	void Start () {
 		
+	}
+
+	public void hit (){
+		health--;
+		if (health <= 0) {
+			Destroy (this.gameObject);
+		}
 	}
 	
 	// Update is called once per frame

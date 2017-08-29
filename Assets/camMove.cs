@@ -9,6 +9,10 @@ public class camMove : MonoBehaviour {
 	void Start () {
 		
 	}
+
+	void OnGUI(){
+		GUI.Label (new Rect (100, 100, 100, 30), "Towers: ");
+	}
 	
 	// Update is called once per frame
 	void Update () {
@@ -16,7 +20,7 @@ public class camMove : MonoBehaviour {
 		{
 			RaycastHit hit;
 			Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-			if (Physics.Raycast (ray.origin,ray.direction,out hit)) {
+			if (Physics.Raycast (ray.origin,ray.direction,out hit) && hit.transform.gameObject.tag == "Ground") {
 				//hit.transform.Translate (-ray.direction * 0.1);
 				Instantiate (tower, hit.point - Vector3.up,Quaternion.identity);
 			}

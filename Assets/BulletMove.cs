@@ -17,7 +17,9 @@ public class BulletMove : MonoBehaviour {
 	void Update () {
 		transform.Translate (Vector3.forward*speed);
 		if ((org - transform.position).magnitude > dist) {
-			Destroy (enm);
+			if (enm != null) {
+				enm.GetComponent<EnemyMovement> ().hit ();
+			}
 			Destroy(this.gameObject);
 		}
 	}
