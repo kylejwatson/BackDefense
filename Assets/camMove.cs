@@ -2,6 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
+/*
+ * TODO: Check that spawn can be reached from goal, simple rule, path of least angle? - if theres an angle try to correct by hopping to square in that direction
+ * 
+ */
 public class camMove : MonoBehaviour {
 	[SerializeField]
 	GameObject tower;
@@ -34,7 +39,7 @@ public class camMove : MonoBehaviour {
 					towerFrameBad.transform.position = hit.transform.gameObject.transform.parent.parent.position;
 				}else */
 				if(hit.transform.gameObject.transform.parent != null){
-					towerFrameBad.transform.position = hit.transform.gameObject.transform.parent.position;
+					towerFrameBad.transform.position = new Vector3 (Mathf.Round (hit.transform.position.x), -8.419251e-17F, Mathf.Round (hit.transform.position.z));
 				}else{
 					towerFrameBad.transform.position = hit.transform.gameObject.transform.position;
 				}
