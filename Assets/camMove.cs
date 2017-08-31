@@ -19,50 +19,70 @@ public class camMove : MonoBehaviour {
 	[SerializeField]
 	GameObject spawner;
 	ArrayList positions = new ArrayList();
+	ArrayList checkedPositions = new ArrayList();
+	float deltaTime = 0.0f;
 	// Use this for initialization
 	void Start () {
 		
 	}
 
 	void OnGUI(){
-		GUI.Label (new Rect (100, 100, 100, 30), "Towers: ");
+		float msec = deltaTime * 1000.0F;
+		float fps = 1.0f / deltaTime;
+		string text = string.Format ("{0:0.0} ms ({1:0.} fps)", msec, fps);
+		GUI.Label (new Rect (100, 100, 100, 30), text);
+
 	}
 	
 	// Update is called once per frame
 
-	bool checkFill(Vector3 pos){
-		if (positions.Contains (pos) || pos.z < 0 || pos.x < 0 || pos.z > 30 || pos.x > 30) {
-			Debug.Log ("objec stop fill at " + pos.x + ":" + pos.z);
+	bool checkFill(Vector3 pos,float maxx, float maxz, float minx, float minz){
+		if (checkedPositions.Contains(pos) || positions.Contains (pos) || pos.z < minz-1 || pos.x < minx-1 || pos.z > maxz+2 || pos.x > maxx+2) {
+			//Debug.Log ("objec stop fill at " + pos.x + ":" + pos.z);
 			return false;
 		} else if (goal.transform.position == pos) {
-			Debug.Log ("objec found goal at " + pos.x + ":" + pos.z);
+			//Debug.Log ("objec found goal at " + pos.x + ":" + pos.z);
 			return true;
 		} else {
-			return checkFill (new Vector3 (pos.x + 1, pos.y, pos.z)) || checkFill (new Vector3 (pos.x - 1, pos.y, pos.z)) || checkFill (new Vector3 (pos.x, pos.y, pos.z + 1)) || checkFill (new Vector3 (pos.x, pos.y, pos.z - 1));
+			checkedPositions.Add (pos);
+			return checkFill (new Vector3 (pos.x + 1, pos.y, pos.z),maxx,maxz,minx,minz) || checkFill (new Vector3 (pos.x - 1, pos.y, pos.z),maxx,maxz,minx,minz) || checkFill (new Vector3 (pos.x, pos.y, pos.z + 1),maxx,maxz,minx,minz) || checkFill (new Vector3 (pos.x, pos.y, pos.z - 1),maxx,maxz,minx,minz);
 		}
 	}
 
-
 	void Update () {
+		deltaTime += (Time.deltaTime - deltaTime) * 0.1f;
 		RaycastHit hit;
 		Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-		towerFrame.transform.position = Vector3.zero;
-		towerFrameBad.transform.position = Vector3.zero;
 		bool canPlace = true;
 		if (Physics.Raycast (ray.origin,ray.direction,out hit)) {
+			Vector3 pos = new Vector3 (Mathf.Round (hit.point.x), 1, Mathf.Round (hit.point.z));
 			if (hit.transform.gameObject.tag == "Ground") {
-				towerFrame.transform.position = new Vector3 (Mathf.Round (hit.point.x), 1, Mathf.Round (hit.point.z));
-				//positions.Add (towerFrame.transform.position);
-				//if (checkFill (towerFrame.transform.position)) {
-
-				//}
-				//bool canMove = true;
-				//Vector3 pos = goal.transform.position;
-				//pos.y = 1;
-
-				//float angle = Mathf.Floor (10000*Mathf.Atan2 (pos.x - spawner.transform.position.x, pos.z - spawner.transform.position.z));
-				//Debug.Log (angle);//Mathf.Floor (angle * 10000) == Mathf.Floor (Mathf.PI / 2 * 10000));
+				if (towerFrame.transform.position != pos && towerFrameBad.transform.position != pos) {
+					checkedPositions.Clear ();
+					positions.Add (pos);
+					float minx = Mathf.Min (goal.transform.position.x, spawner.transform.position.x);
+					float minz = Mathf.Min (goal.transform.position.z, spawner.transform.position.z);
+					float maxx = Mathf.Max (goal.transform.position.x, spawner.transform.position.x);
+					float maxz = Mathf.Max (goal.transform.position.z, spawner.transform.position.z);
+					foreach (Vector3 v in positions) {
+						minx = Mathf.Min (minx, v.x);
+						minz = Mathf.Min (minz,v.z);
+						maxx = Mathf.Max (maxx,v.x);
+						maxz = Mathf.Max (maxz,v.z);
+					}
+					Debug.Log (minx + " " + minz + " " + maxx + " " + maxz);
+					if (!checkFill (spawner.transform.position,maxx,maxz,minx,minz)) {
+						towerFrame.transform.position = Vector3.zero;
+						canPlace = false;
+						towerFrameBad.transform.position = pos;
+					} else {
+						towerFrame.transform.position = pos; 
+						towerFrameBad.transform.position = Vector3.zero;
+					}
+					positions.Remove (pos);
+				}
 			} else if (hit.transform.gameObject.tag != "Frame") {
+				towerFrame.transform.position = Vector3.zero;
 				if (hit.transform.gameObject.transform.parent != null) {
 					towerFrameBad.transform.position = new Vector3 (Mathf.Round (hit.transform.position.x),1, Mathf.Round (hit.transform.position.z));
 				} else {
@@ -74,7 +94,6 @@ public class camMove : MonoBehaviour {
 		if (Input.GetButtonDown("Fire1") && canPlace)
 		{
 			positions.Add (towerFrame.transform.position);
-			Debug.Log(checkFill(spawner.transform.position);
 			Instantiate (tower, towerFrame.transform.position,Quaternion.identity);
 		}
 
