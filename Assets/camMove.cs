@@ -14,6 +14,11 @@ public class camMove : MonoBehaviour {
 	GameObject towerFrame;
 	[SerializeField]
 	GameObject towerFrameBad;
+	[SerializeField]
+	GameObject goal;
+	[SerializeField]
+	GameObject spawner;
+	ArrayList positions = new ArrayList();
 	// Use this for initialization
 	void Start () {
 		
@@ -24,6 +29,20 @@ public class camMove : MonoBehaviour {
 	}
 	
 	// Update is called once per frame
+
+	bool checkFill(Vector3 pos){
+		if (positions.Contains (pos) || pos.z < 0 || pos.x < 0 || pos.z > 30 || pos.x > 30) {
+			Debug.Log ("objec stop fill at " + pos.x + ":" + pos.z);
+			return false;
+		} else if (goal.transform.position == pos) {
+			Debug.Log ("objec found goal at " + pos.x + ":" + pos.z);
+			return true;
+		} else {
+			return checkFill (new Vector3 (pos.x + 1, pos.y, pos.z)) || checkFill (new Vector3 (pos.x - 1, pos.y, pos.z)) || checkFill (new Vector3 (pos.x, pos.y, pos.z + 1)) || checkFill (new Vector3 (pos.x, pos.y, pos.z - 1));
+		}
+	}
+
+
 	void Update () {
 		RaycastHit hit;
 		Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -31,26 +50,31 @@ public class camMove : MonoBehaviour {
 		towerFrameBad.transform.position = Vector3.zero;
 		bool canPlace = true;
 		if (Physics.Raycast (ray.origin,ray.direction,out hit)) {
-			//hit.transform.Translate (-ray.direction * 0.1);
 			if (hit.transform.gameObject.tag == "Ground") {
-				towerFrame.transform.position = new Vector3 (Mathf.Round (hit.point.x), hit.point.y, Mathf.Round (hit.point.z));
+				towerFrame.transform.position = new Vector3 (Mathf.Round (hit.point.x), 1, Mathf.Round (hit.point.z));
+				//positions.Add (towerFrame.transform.position);
+				//if (checkFill (towerFrame.transform.position)) {
+
+				//}
+				//bool canMove = true;
+				//Vector3 pos = goal.transform.position;
+				//pos.y = 1;
+
+				//float angle = Mathf.Floor (10000*Mathf.Atan2 (pos.x - spawner.transform.position.x, pos.z - spawner.transform.position.z));
+				//Debug.Log (angle);//Mathf.Floor (angle * 10000) == Mathf.Floor (Mathf.PI / 2 * 10000));
 			} else if (hit.transform.gameObject.tag != "Frame") {
-				/*if(hit.transform.gameObject.transform.parent.parent != null){
-					towerFrameBad.transform.position = hit.transform.gameObject.transform.parent.parent.position;
-				}else */
-				if(hit.transform.gameObject.transform.parent != null){
-					towerFrameBad.transform.position = new Vector3 (Mathf.Round (hit.transform.position.x), -8.419251e-17F, Mathf.Round (hit.transform.position.z));
-				}else{
+				if (hit.transform.gameObject.transform.parent != null) {
+					towerFrameBad.transform.position = new Vector3 (Mathf.Round (hit.transform.position.x),1, Mathf.Round (hit.transform.position.z));
+				} else {
 					towerFrameBad.transform.position = hit.transform.gameObject.transform.position;
 				}
 				canPlace = false;
-				//hit.transform.gameObject.gameObject
-			}
-			//hit.point = new Vector3(Mathf.Round(hit.point.x),hit.point.y,Mathf.Round(hit.point.z));
-			//Instantiate (tower, hit.point - Vector3.up,Quaternion.identity);
+			} 
 		}
 		if (Input.GetButtonDown("Fire1") && canPlace)
 		{
+			positions.Add (towerFrame.transform.position);
+			Debug.Log(checkFill(spawner.transform.position);
 			Instantiate (tower, towerFrame.transform.position,Quaternion.identity);
 		}
 
