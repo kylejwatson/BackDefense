@@ -18,7 +18,7 @@ public class camMove : MonoBehaviour {
 	GameObject goal;
 	[SerializeField]
 	GameObject spawner;
-	ArrayList positions = new ArrayList();
+	public ArrayList positions = new ArrayList();
 	ArrayList checkedPositions = new ArrayList();
 	float deltaTime = 0.0f;
 	// Use this for initialization
@@ -70,7 +70,7 @@ public class camMove : MonoBehaviour {
 						maxx = Mathf.Max (maxx,v.x);
 						maxz = Mathf.Max (maxz,v.z);
 					}
-					Debug.Log (minx + " " + minz + " " + maxx + " " + maxz);
+					//Debug.Log (minx + " " + minz + " " + maxx + " " + maxz);
 					if (!checkFill (spawner.transform.position,maxx,maxz,minx,minz)) {
 						towerFrame.transform.position = Vector3.zero;
 						canPlace = false;
