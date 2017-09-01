@@ -21,9 +21,17 @@ public class camMove : MonoBehaviour {
 	public ArrayList positions = new ArrayList();
 	ArrayList checkedPositions = new ArrayList();
 	float deltaTime = 0.0f;
+
+	public float minx;
+	public float minz;
+	public float maxx;
+	public float maxz;
 	// Use this for initialization
 	void Start () {
-		
+		minx = Mathf.Min (goal.transform.position.x, spawner.transform.position.x);
+		minz = Mathf.Min (goal.transform.position.z, spawner.transform.position.z);
+		maxx = Mathf.Max (goal.transform.position.x, spawner.transform.position.x);
+		maxz = Mathf.Max (goal.transform.position.z, spawner.transform.position.z);
 	}
 
 	void OnGUI(){
@@ -60,10 +68,6 @@ public class camMove : MonoBehaviour {
 				if (towerFrame.transform.position != pos && towerFrameBad.transform.position != pos) {
 					checkedPositions.Clear ();
 					positions.Add (pos);
-					float minx = Mathf.Min (goal.transform.position.x, spawner.transform.position.x);
-					float minz = Mathf.Min (goal.transform.position.z, spawner.transform.position.z);
-					float maxx = Mathf.Max (goal.transform.position.x, spawner.transform.position.x);
-					float maxz = Mathf.Max (goal.transform.position.z, spawner.transform.position.z);
 					foreach (Vector3 v in positions) {
 						minx = Mathf.Min (minx, v.x);
 						minz = Mathf.Min (minz,v.z);

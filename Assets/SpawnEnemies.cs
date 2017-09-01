@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class SpawnEnemies : MonoBehaviour {
-
+	//WHY CANT I GET JUST AN ELEMENT FROM THE DICTIONARY MOTHERFUCKER
 	public class Node{
 		public float x;
 		public float z;
@@ -33,6 +33,7 @@ public class SpawnEnemies : MonoBehaviour {
 		}
 	}
 
+	Node lastAdded;
 	int cnt;
 	[SerializeField]
 	GameObject goal;
@@ -45,10 +46,6 @@ public class SpawnEnemies : MonoBehaviour {
 	[SerializeField]
 	GameObject point;
 
-	public float minx = -10;
-	public float minz = -10;
-	public float maxx = 20;
-	public float maxz = 20;
 	Dictionary<Vector2,Node> closed;
 	Dictionary<Vector2,Node> open;
 	// Use this for initialization
@@ -71,14 +68,14 @@ public class SpawnEnemies : MonoBehaviour {
 			int i = 0;
 			while (goal.transform.position != new Vector3 (curNode.x, 1F, curNode.z)) {
 				
-				Node n1 = addNode (curNode, 1, 0);
-				Node n2 = addNode (curNode, 0, 1);
-				Node n3 = addNode (curNode, 0, -1);
-				Node n4 = addNode (curNode, -1, 0);
+				addNode (curNode, 1, 0);
+				addNode (curNode, 0, 1);
+				addNode (curNode, 0, -1);
+				addNode (curNode, -1, 0);
 				open.Remove (new Vector2(curNode.x,curNode.z));
 
-				float smallestF = //open.Values.;
-				Node closest = no;
+				float smallestF = lastAdded.f;
+				Node closest = lastAdded;
 				Debug.Log ("open: " + open.Count);
 				foreach (Node n in open.Values) {
 					if (n.f <= smallestF) {
@@ -93,9 +90,10 @@ public class SpawnEnemies : MonoBehaviour {
 				closed.Add(new Vector2(curNode.x,curNode.z),curNode);
 				i++;
 			}
-			foreach (Node n in closed.Values) {
-				n.printStats ();
-				Instantiate (point, new Vector3 (n.x, 1F, n.z), Quaternion.Euler(Vector3.zero));
+			while (curNode.parent != null) {
+				curNode.printStats ();
+				Instantiate (point, new Vector3 (curNode.x, 1F, curNode.z), Quaternion.Euler(Vector3.zero));
+				curNode = curNode.parent;
 			}
 
 			//camera.SetActive (!camera.activeInHierarchy);
@@ -104,21 +102,25 @@ public class SpawnEnemies : MonoBehaviour {
 		}
 	}
 
-	Node addNode(Node node,int x, int z){
+	void addNode(Node node,int x, int z){
 		Vector3 v = new Vector3 (node.x + x, 1F, node.z+z);
+
+		float minx = camera.GetComponent<camMove>().minx;
+		float minz =  camera.GetComponent<camMove>().minz;
+		float maxx = camera.GetComponent<camMove>().maxx;
+		float maxz = camera.GetComponent<camMove> ().maxz;
 		//v.x > minx && v.x < maxx && v.z > minz && v.z < maxz && 
-		if (!camera.GetComponent<camMove> ().positions.Contains(v) && !closed.ContainsKey(new Vector2 (v.x, v.z))) {
+		if (!camera.GetComponent<camMove> ().positions.Contains(v) && !closed.ContainsKey(new Vector2 (v.x, v.z)) && v.z >= minz -1 && v.x >= minx-1 && v.z <= maxz+1 && v.x <= maxx+1) {
 			if (open.ContainsKey (new Vector2 (v.x, v.z))) {
 				Debug.Log ("dupe");
 				open [new Vector2 (v.x, v.z)].parent = node;
 				open [new Vector2 (v.x, v.z)].calculateF ();
-				return open [new Vector2 (v.x, v.z)];
+				lastAdded = open [new Vector2 (v.x, v.z)];
 			} else {
 				Node n = new Node (v.x, v.z, node, goal.transform.position);
 				open.Add (new Vector2 (v.x, v.z), n);
-				return n;
+				lastAdded = n;
 			}
 		}
-		return null;
 	}
 }
