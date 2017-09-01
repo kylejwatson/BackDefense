@@ -74,7 +74,6 @@ public class camMove : MonoBehaviour {
 						maxx = Mathf.Max (maxx,v.x);
 						maxz = Mathf.Max (maxz,v.z);
 					}
-					//Debug.Log (minx + " " + minz + " " + maxx + " " + maxz);
 					if (!checkFill (spawner.transform.position,maxx,maxz,minx,minz)) {
 						towerFrame.transform.position = Vector3.zero;
 						canPlace = false;

@@ -28,9 +28,6 @@ public class SpawnEnemies : MonoBehaviour {
 			}
 			f = h+g;
 		}
-		public void printStats(){
-			Debug.Log ("X: " + x + " Z: " + z + " F: " + f + " H: " + h + " G: " + g);
-		}
 	}
 
 	Node lastAdded;
@@ -76,29 +73,23 @@ public class SpawnEnemies : MonoBehaviour {
 
 				float smallestF = lastAdded.f;
 				Node closest = lastAdded;
-				Debug.Log ("open: " + open.Count);
 				foreach (Node n in open.Values) {
 					if (n.f <= smallestF) {
 						smallestF = n.f;
 						closest = n;
 					}
 				}
-				//Debug.Log (open.LastIndexOf (closest));
-
-				//closest.printStats ();
 				curNode = closest;
 				closed.Add(new Vector2(curNode.x,curNode.z),curNode);
 				i++;
 			}
 			while (curNode.parent != null) {
-				curNode.printStats ();
 				Instantiate (point, new Vector3 (curNode.x, 1F, curNode.z), Quaternion.Euler(Vector3.zero));
 				curNode = curNode.parent;
 			}
 
 			//camera.SetActive (!camera.activeInHierarchy);
 			//fps.SetActive (!fps.activeInHierarchy);
-			Debug.Log ("teetet");
 		}
 	}
 
@@ -109,10 +100,8 @@ public class SpawnEnemies : MonoBehaviour {
 		float minz =  camera.GetComponent<camMove>().minz;
 		float maxx = camera.GetComponent<camMove>().maxx;
 		float maxz = camera.GetComponent<camMove> ().maxz;
-		//v.x > minx && v.x < maxx && v.z > minz && v.z < maxz && 
 		if (!camera.GetComponent<camMove> ().positions.Contains(v) && !closed.ContainsKey(new Vector2 (v.x, v.z)) && v.z >= minz -1 && v.x >= minx-1 && v.z <= maxz+1 && v.x <= maxx+1) {
 			if (open.ContainsKey (new Vector2 (v.x, v.z))) {
-				Debug.Log ("dupe");
 				open [new Vector2 (v.x, v.z)].parent = node;
 				open [new Vector2 (v.x, v.z)].calculateF ();
 				lastAdded = open [new Vector2 (v.x, v.z)];
