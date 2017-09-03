@@ -26,6 +26,9 @@ public class camMove : MonoBehaviour {
 	public float minz;
 	public float maxx;
 	public float maxz;
+
+	bool spawningEnemies = false;
+
 	// Use this for initialization
 	void Start () {
 		minx = Mathf.Min (goal.transform.position.x, spawner.transform.position.x);
@@ -59,45 +62,56 @@ public class camMove : MonoBehaviour {
 
 	void Update () {
 		deltaTime += (Time.deltaTime - deltaTime) * 0.1f;
-		RaycastHit hit;
-		Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-		bool canPlace = true;
-		if (Physics.Raycast (ray.origin,ray.direction,out hit)) {
-			Vector3 pos = new Vector3 (Mathf.Round (hit.point.x), 1, Mathf.Round (hit.point.z));
-			if (hit.transform.gameObject.tag == "Ground") {
-				if (towerFrame.transform.position != pos && towerFrameBad.transform.position != pos) {
-					checkedPositions.Clear ();
-					positions.Add (pos);
-					foreach (Vector3 v in positions) {
-						minx = Mathf.Min (minx, v.x);
-						minz = Mathf.Min (minz,v.z);
-						maxx = Mathf.Max (maxx,v.x);
-						maxz = Mathf.Max (maxz,v.z);
+		if (!spawningEnemies) {
+			RaycastHit hit;
+			Ray ray = Camera.main.ScreenPointToRay (Input.mousePosition);
+			bool canPlace = true;
+			if (Physics.Raycast (ray.origin, ray.direction, out hit)) {
+				Vector3 pos = new Vector3 (Mathf.Round (hit.point.x), 1, Mathf.Round (hit.point.z));
+				if (hit.transform.gameObject.tag == "Ground") {
+					if (towerFrame.transform.position != pos && towerFrameBad.transform.position != pos) {
+						checkedPositions.Clear ();
+						positions.Add (pos);
+						foreach (Vector3 v in positions) {
+							minx = Mathf.Min (minx, v.x);
+							minz = Mathf.Min (minz, v.z);
+							maxx = Mathf.Max (maxx, v.x);
+							maxz = Mathf.Max (maxz, v.z);
+						}
+						if (!checkFill (spawner.transform.position, maxx, maxz, minx, minz)) {
+							towerFrame.SetActive (false);
+							canPlace = false;
+							towerFrameBad.SetActive (true);
+							towerFrameBad.transform.position = pos;
+						} else {
+							towerFrame.SetActive (true);
+							towerFrame.transform.position = pos; 
+							towerFrameBad.SetActive (false);
+						}
+						positions.Remove (pos);
 					}
-					if (!checkFill (spawner.transform.position,maxx,maxz,minx,minz)) {
-						towerFrame.transform.position = Vector3.zero;
-						canPlace = false;
-						towerFrameBad.transform.position = pos;
+				} else if (hit.transform.gameObject.tag != "Frame") {
+					towerFrame.SetActive (false);
+					towerFrameBad.SetActive (true);
+					if (hit.transform.gameObject.transform.parent != null) {
+						towerFrameBad.transform.position = new Vector3 (Mathf.Round (hit.transform.position.x), 1, Mathf.Round (hit.transform.position.z));
 					} else {
-						towerFrame.transform.position = pos; 
-						towerFrameBad.transform.position = Vector3.zero;
+						towerFrameBad.transform.position = hit.transform.gameObject.transform.position;
 					}
-					positions.Remove (pos);
-				}
-			} else if (hit.transform.gameObject.tag != "Frame") {
-				towerFrame.transform.position = Vector3.zero;
-				if (hit.transform.gameObject.transform.parent != null) {
-					towerFrameBad.transform.position = new Vector3 (Mathf.Round (hit.transform.position.x),1, Mathf.Round (hit.transform.position.z));
-				} else {
-					towerFrameBad.transform.position = hit.transform.gameObject.transform.position;
-				}
-				canPlace = false;
-			} 
-		}
-		if (Input.GetButtonDown("Fire1") && canPlace)
-		{
-			positions.Add (towerFrame.transform.position);
-			Instantiate (tower, towerFrame.transform.position,Quaternion.identity);
+					canPlace = false;
+				} 
+			}
+			if (Input.GetButtonDown ("Fire1") && canPlace) {
+				positions.Add (towerFrame.transform.position);
+				GameObject newTower = Instantiate (tower, towerFrame.transform.position, Quaternion.identity);
+				newTower.SetActive (true);
+			}
+			if (Input.GetButtonDown ("Fire2")) {
+				spawningEnemies = true;
+				spawner.GetComponent<SpawnEnemies> ().startSpawning = true;
+				towerFrame.SetActive (false);
+				towerFrameBad.SetActive (false);
+			}
 		}
 
 		if (Input.mousePosition.x < 0) {
