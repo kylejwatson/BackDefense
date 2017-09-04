@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 
 /*
@@ -15,12 +16,25 @@ public class camMove : MonoBehaviour {
 	[SerializeField]
 	GameObject towerFrameBad;
 	[SerializeField]
+	GameObject towerWall;
+	[SerializeField]
 	GameObject goal;
 	[SerializeField]
 	GameObject spawner;
+	[SerializeField]
+	GameObject otherCam;
+	[SerializeField]
+	Texture2D frame;
+	[SerializeField]
+	Text fpsText;
+	[SerializeField]
+	int wallTowers;
+	[SerializeField]
+	int gunTowers;
 	public ArrayList positions = new ArrayList();
 	ArrayList checkedPositions = new ArrayList();
 	float deltaTime = 0.0f;
+	GameObject curTower;
 
 	public float minx;
 	public float minz;
@@ -35,14 +49,14 @@ public class camMove : MonoBehaviour {
 		minz = Mathf.Min (goal.transform.position.z, spawner.transform.position.z);
 		maxx = Mathf.Max (goal.transform.position.x, spawner.transform.position.x);
 		maxz = Mathf.Max (goal.transform.position.z, spawner.transform.position.z);
+		curTower = tower;
 	}
 
-	void OnGUI(){
+	void guiText(){
 		float msec = deltaTime * 1000.0F;
 		float fps = 1.0f / deltaTime;
 		string text = string.Format ("{0:0.0} ms ({1:0.} fps)", msec, fps);
-		GUI.Label (new Rect (100, 100, 100, 30), text);
-
+		fpsText.text = text;
 	}
 	
 	// Update is called once per frame
@@ -62,12 +76,22 @@ public class camMove : MonoBehaviour {
 
 	void Update () {
 		deltaTime += (Time.deltaTime - deltaTime) * 0.1f;
+		guiText ();
+		if (Input.GetKey (KeyCode.P)) {
+			gameObject.SetActive (false);
+			otherCam.SetActive (true);
+		}
 		if (!spawningEnemies) {
+			if (Input.GetAxis ("WpnChange") < 0F) {
+				transform.Translate (Vector3.back);
+			} else if (Input.GetAxis ("WpnChange") > 0F) {
+				transform.Translate (Vector3.forward);
+			}
 			RaycastHit hit;
 			Ray ray = Camera.main.ScreenPointToRay (Input.mousePosition);
 			bool canPlace = true;
 			if (Physics.Raycast (ray.origin, ray.direction, out hit)) {
-				Vector3 pos = new Vector3 (Mathf.Round (hit.point.x), 1, Mathf.Round (hit.point.z));
+				Vector3 pos = new Vector3 (Mathf.Round (hit.point.x), 0.5F, Mathf.Round (hit.point.z));
 				if (hit.transform.gameObject.tag == "Ground") {
 					if (towerFrame.transform.position != pos && towerFrameBad.transform.position != pos) {
 						checkedPositions.Clear ();
@@ -94,19 +118,25 @@ public class camMove : MonoBehaviour {
 					towerFrame.SetActive (false);
 					towerFrameBad.SetActive (true);
 					if (hit.transform.gameObject.transform.parent != null) {
-						towerFrameBad.transform.position = new Vector3 (Mathf.Round (hit.transform.position.x), 1, Mathf.Round (hit.transform.position.z));
+						towerFrameBad.transform.position = new Vector3 (Mathf.Round (hit.transform.position.x), 0.5F, Mathf.Round (hit.transform.position.z));
 					} else {
 						towerFrameBad.transform.position = hit.transform.gameObject.transform.position;
 					}
 					canPlace = false;
 				} 
 			}
-			if (Input.GetButtonDown ("Fire1") && canPlace) {
+			if (Input.GetButtonDown ("Fire1") && canPlace && gunTowers > 0) {
 				positions.Add (towerFrame.transform.position);
 				GameObject newTower = Instantiate (tower, towerFrame.transform.position, Quaternion.identity);
 				newTower.SetActive (true);
+				gunTowers--;
+			}if (Input.GetButtonDown ("Fire2") && canPlace && wallTowers > 0) {
+				positions.Add (towerFrame.transform.position);
+				GameObject newTower = Instantiate (towerWall, towerFrame.transform.position, Quaternion.identity);
+				newTower.SetActive (true);
+				wallTowers--;
 			}
-			if (Input.GetButtonDown ("Fire2")) {
+			if (Input.GetButtonDown ("Jump")) {
 				spawningEnemies = true;
 				spawner.GetComponent<SpawnEnemies> ().startSpawning = true;
 				towerFrame.SetActive (false);

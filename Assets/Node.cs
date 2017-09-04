@@ -1,4 +1,5 @@
-﻿public class Node{
+﻿using UnityEngine;
+public class Node{
 	public float x;
 	public float z;
 	public int f;

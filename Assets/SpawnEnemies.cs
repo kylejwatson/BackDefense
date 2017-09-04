@@ -15,10 +15,13 @@ public class SpawnEnemies : MonoBehaviour {
 	GameObject fps;
 	[SerializeField]
 	GameObject point;
+	[SerializeField]
+	int wave = 10;
+	int waveCnt;
 
 	Dictionary<Vector2,Node> closed;
 	Dictionary<Vector2,Node> open;
-	List<Node> path;
+	Node pathNode;
 
 	public bool startSpawning = false;
 	bool spawning = false;
@@ -32,10 +35,15 @@ public class SpawnEnemies : MonoBehaviour {
 	void Update () {
 		if (spawning) {
 			cnt++;
-			if (cnt > 100) {
-				GameObject enemy = Instantiate (enm, this.transform.position, Quaternion.identity);
+			if (cnt > 100 && waveCnt < wave) {
+				GameObject enemy = Instantiate (enm, goal.transform.position, Quaternion.identity);
 				enemy.GetComponent<EnemyMovement> ().goal = goal;
+				enemy.GetComponent<EnemyMovement> ().curNode = pathNode;
+				if (waveCnt + 1 == wave) {
+					enemy.GetComponent<EnemyMovement> ().fps = fps;
+				}
 				cnt = 0;
+				waveCnt++;
 			}
 		}
 		if (startSpawning) {
@@ -62,15 +70,17 @@ public class SpawnEnemies : MonoBehaviour {
 				closed.Add(new Vector2(curNode.x,curNode.z),curNode);
 				i++;
 			}
+			pathNode = curNode;
 			while (curNode.parent != null) {
-				Instantiate (point, new Vector3 (curNode.x, 1F, curNode.z), Quaternion.Euler(Vector3.zero));
+				//Instantiate (point, new Vector3 (curNode.x, 1F, curNode.z), Quaternion.Euler(Vector3.zero));
 				curNode = curNode.parent;
 			}
 			spawning = true;
 			startSpawning = false;
+			GameObject enemy = Instantiate (enm, goal.transform.position, Quaternion.identity);
+			enemy.GetComponent<EnemyMovement> ().goal = goal;
+			enemy.GetComponent<EnemyMovement> ().curNode = pathNode;
 
-			//camera.SetActive (!camera.activeInHierarchy);
-			//fps.SetActive (!fps.activeInHierarchy);
 		}
 	}
 
