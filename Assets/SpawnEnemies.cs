@@ -54,7 +54,7 @@ public class SpawnEnemies : MonoBehaviour {
 			Node start = new Node (this.transform.position.x, this.transform.position.z, null, goal.transform.position);
 			Node curNode = start;
 			int i = 0;
-			while (goal.transform.position != new Vector3 (curNode.x, 1F, curNode.z)) {
+			while (goal.transform.position != new Vector3 (curNode.x, 0.5F, curNode.z)) {
 				
 				addNode (curNode, 1, 0);
 				addNode (curNode, 0, 1);
@@ -89,7 +89,7 @@ public class SpawnEnemies : MonoBehaviour {
 	}
 
 	void addNode(Node node,int x, int z){
-		Vector3 v = new Vector3 (node.x + x, 1F, node.z+z);
+		Vector3 v = new Vector3 (node.x + x, 0.5F, node.z+z);
 
 		float minx = camera.GetComponent<camMove>().minx;
 		float minz =  camera.GetComponent<camMove>().minz;

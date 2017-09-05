@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class BulletMove : MonoBehaviour {
-	[SerializeField]
-	float speed;
+	float speed = 7;
 	public Vector3 org;
 	public float dist;
 	public GameObject enm;

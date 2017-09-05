@@ -26,6 +26,11 @@ public class EnemyMovement : MonoBehaviour {
 	public void hit (){
 		health--;
 		if (health <= 0) {
+			if (fps != null) {
+				Camera.main.gameObject.SetActive (false);
+				//Camera.main
+				fps.SetActive (true);
+			}
 			Destroy (this.gameObject);
 		}
 	}
@@ -43,11 +48,11 @@ public class EnemyMovement : MonoBehaviour {
 				curNode = curNode.parent;
 				Debug.Log (curNode.x + " " + curNode.z);
 			} else {
-				Destroy (this.gameObject);
 				if (fps != null) {
 					Camera.main.gameObject.SetActive (false);
 					fps.SetActive (true);
 				}
+				Destroy (this.gameObject);
 			}
 		}
 

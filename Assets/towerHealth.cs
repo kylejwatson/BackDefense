@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class UIText : MonoBehaviour {
-
+public class towerHealth : MonoBehaviour {
+	int health = 3;
 	// Use this for initialization
 	void Start () {
 		
@@ -12,5 +12,11 @@ public class UIText : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		
+	}
+	public void hit(){
+		health--;
+		if (health < 1) {
+			Destroy (gameObject);
+		}
 	}
 }

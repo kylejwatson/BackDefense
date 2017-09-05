@@ -5,6 +5,7 @@ using UnityEngine;
 public class TowerAim : MonoBehaviour {
 
 	int cnt =0; 
+	int bulShow = 0;
 	[SerializeField]
 	GameObject bul;
 	// Use this for initialization
@@ -30,13 +31,20 @@ public class TowerAim : MonoBehaviour {
 				aimObject = g;
 			}
 		}
+		if (GetComponent<LineRenderer> ().enabled) {
+			bulShow++;
+			if (bulShow > 20) {
+				GetComponent<LineRenderer> ().enabled = false;
+				bulShow = 0;
+			}
+		}
 		if (isAiming) {
 			cnt++;
 			if (cnt > 50) {
-				GameObject newBullet = Instantiate (bul, transform.position, transform.rotation);
-				newBullet.GetComponent<BulletMove> ().org = transform.position;
-				newBullet.GetComponent<BulletMove> ().dist = (transform.position - aimObject.transform.position).magnitude;
-				newBullet.GetComponent<BulletMove> ().enm = aimObject;
+				GetComponent<LineRenderer> ().enabled = true;
+				GetComponent<LineRenderer> ().SetPosition (0, transform.position);
+				GetComponent<LineRenderer> ().SetPosition (1, aimObject.transform.position);
+				aimObject.GetComponent<EnemyMovement> ().hit ();
 				cnt = 0;
 			}
 		}

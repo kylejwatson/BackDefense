@@ -3,11 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-
-/*
- * TODO: Check that spawn can be reached from goal, simple rule, path of least angle? - if theres an angle try to correct by hopping to square in that direction
- * 
- */
 public class camMove : MonoBehaviour {
 	[SerializeField]
 	GameObject tower;
@@ -86,11 +81,6 @@ public class camMove : MonoBehaviour {
 			otherCam.SetActive (true);
 		}
 		if (!spawningEnemies) {
-			if (Input.GetAxis ("WpnChange") < 0F) {
-				transform.Translate (Vector3.back);
-			} else if (Input.GetAxis ("WpnChange") > 0F) {
-				transform.Translate (Vector3.forward);
-			}
 			RaycastHit hit;
 			Ray ray = Camera.main.ScreenPointToRay (Input.mousePosition);
 			bool canPlace = true;
@@ -160,6 +150,11 @@ public class camMove : MonoBehaviour {
 			Camera.main.transform.Translate (Vector3.down/2);
 		} else if (Input.mousePosition.y > Screen.height) {
 			Camera.main.transform.Translate (Vector3.up/2);
+		}
+		if (Input.GetAxis ("WpnChange") < 0F) {
+			transform.Translate (Vector3.back);
+		} else if (Input.GetAxis ("WpnChange") > 0F) {
+			transform.Translate (Vector3.forward);
 		}
 	}
 }
