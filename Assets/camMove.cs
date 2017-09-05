@@ -31,6 +31,10 @@ public class camMove : MonoBehaviour {
 	int wallTowers;
 	[SerializeField]
 	int gunTowers;
+	[SerializeField]
+	Text gText;
+	[SerializeField]
+	Text wText;
 	public ArrayList positions = new ArrayList();
 	ArrayList checkedPositions = new ArrayList();
 	float deltaTime = 0.0f;
@@ -50,6 +54,8 @@ public class camMove : MonoBehaviour {
 		maxx = Mathf.Max (goal.transform.position.x, spawner.transform.position.x);
 		maxz = Mathf.Max (goal.transform.position.z, spawner.transform.position.z);
 		curTower = tower;
+		wText.text = "Wall Towers: " + wallTowers;
+		gText.text = "Gun Towers: " + gunTowers;
 	}
 
 	void guiText(){
@@ -63,10 +69,8 @@ public class camMove : MonoBehaviour {
 
 	bool checkFill(Vector3 pos,float maxx, float maxz, float minx, float minz){
 		if (checkedPositions.Contains(pos) || positions.Contains (pos) || pos.z < minz-1 || pos.x < minx-1 || pos.z > maxz+2 || pos.x > maxx+2) {
-			//Debug.Log ("objec stop fill at " + pos.x + ":" + pos.z);
 			return false;
 		} else if (goal.transform.position == pos) {
-			//Debug.Log ("objec found goal at " + pos.x + ":" + pos.z);
 			return true;
 		} else {
 			checkedPositions.Add (pos);
@@ -96,6 +100,7 @@ public class camMove : MonoBehaviour {
 					if (towerFrame.transform.position != pos && towerFrameBad.transform.position != pos) {
 						checkedPositions.Clear ();
 						positions.Add (pos);
+						Debug.Log ("test");
 						foreach (Vector3 v in positions) {
 							minx = Mathf.Min (minx, v.x);
 							minz = Mathf.Min (minz, v.z);
@@ -130,11 +135,14 @@ public class camMove : MonoBehaviour {
 				GameObject newTower = Instantiate (tower, towerFrame.transform.position, Quaternion.identity);
 				newTower.SetActive (true);
 				gunTowers--;
+				gText.text = "Gun Towers: " + gunTowers;
+
 			}if (Input.GetButtonDown ("Fire2") && canPlace && wallTowers > 0) {
 				positions.Add (towerFrame.transform.position);
 				GameObject newTower = Instantiate (towerWall, towerFrame.transform.position, Quaternion.identity);
 				newTower.SetActive (true);
 				wallTowers--;
+				wText.text = "Wall Towers: " + wallTowers;
 			}
 			if (Input.GetButtonDown ("Jump")) {
 				spawningEnemies = true;

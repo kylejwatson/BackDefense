@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class SpawnEnemies : MonoBehaviour {
 	Node lastAdded;
@@ -17,6 +18,8 @@ public class SpawnEnemies : MonoBehaviour {
 	GameObject point;
 	[SerializeField]
 	int wave = 10;
+	[SerializeField]
+	Text enemyText;
 	int waveCnt;
 
 	Dictionary<Vector2,Node> closed;
@@ -42,6 +45,7 @@ public class SpawnEnemies : MonoBehaviour {
 				if (waveCnt + 1 == wave) {
 					enemy.GetComponent<EnemyMovement> ().fps = fps;
 				}
+				enemyText.text = "Enemies: " + waveCnt + "/" + wave;
 				cnt = 0;
 				waveCnt++;
 			}
