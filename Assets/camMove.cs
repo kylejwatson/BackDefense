@@ -97,10 +97,9 @@ public class camMove : MonoBehaviour {
 			if (Physics.Raycast (ray.origin, ray.direction, out hit)) {
 				Vector3 pos = new Vector3 (Mathf.Round (hit.point.x), 0.5F, Mathf.Round (hit.point.z));
 				if (hit.transform.gameObject.tag == "Ground") {
-					if (towerFrame.transform.position != pos && towerFrameBad.transform.position != pos) {
+					if ((towerFrame.transform.position != pos |! towerFrame.activeInHierarchy) && (towerFrameBad.transform.position != pos |! towerFrameBad.activeInHierarchy)) {
 						checkedPositions.Clear ();
 						positions.Add (pos);
-						Debug.Log ("test");
 						foreach (Vector3 v in positions) {
 							minx = Mathf.Min (minx, v.x);
 							minz = Mathf.Min (minz, v.z);
