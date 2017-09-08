@@ -11,10 +11,34 @@ public class gunAim : MonoBehaviour {
 	Camera m_camera;
 	[SerializeField]
 	GameObject decalHitWall;
+	[SerializeField]
+	Camera endCamera;
+	[SerializeField]
+	GameObject curCanvas;
+	[SerializeField]
+	GameObject endCanvas;
+	[SerializeField]
+	GameObject fps;
+	[SerializeField]
+	GameObject spawn;
 	int cnt;
+	int health = 3;
+
 	// Use this for initialization
 	void Start () {
+		fps.transform.position = spawn.transform.position;
+		fps.transform.Translate (Vector3.up * 5);
+	}
 		
+	public void hit(){
+		health--;
+		if (health <1) {
+			//dies
+			endCamera.gameObject.SetActive(true);
+			curCanvas.SetActive (false);
+			endCanvas.SetActive (true);
+			Destroy (fps);
+		}
 	}
 
 	void OnGUI(){
@@ -31,8 +55,10 @@ public class gunAim : MonoBehaviour {
 				//Instantiate (point, hit.point, new Quaternion (0, 0, 0, 0));
 				Vector3 norm =-hit.normal;//Vector3.one * 180 - hit.normal;
 				Quaternion rot = Quaternion.LookRotation(norm);
-				Instantiate(decalHitWall, hit.point + (hit.normal * 0.001F), rot);
+				GameObject newDecal = Instantiate(decalHitWall, hit.point + (hit.normal * 0.001F), rot);
+
 				if (hit.transform.tag == "Tower") {
+					newDecal.transform.SetParent (hit.transform);
 					hit.transform.GetComponent<towerHealth> ().hit ();
 				}
 			}

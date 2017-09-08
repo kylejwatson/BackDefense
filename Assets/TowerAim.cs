@@ -19,16 +19,21 @@ public class TowerAim : MonoBehaviour {
 		Collider[] cols = Physics.OverlapSphere (transform.position, 5F);
 		Quaternion rot = transform.rotation;
 		GameObject aimObject = null;
+		GameObject playerObject = null;
 		foreach (Collider col in cols) {
 			GameObject g = col.gameObject;
-			if (g != null && g.tag == "Enemy"){
+			if (g != null && (g.tag == "Enemy" || g.tag == "Player")){
 				isAiming = true;
 				Vector3 dir = (g.transform.position - this.transform.position);
 				Vector3 newDir = Vector3.RotateTowards (transform.forward, dir,1F,0.0F);
 				transform.rotation = Quaternion.LookRotation (newDir);
 				rot = transform.rotation;
 				transform.rotation = Quaternion.Euler (0, transform.rotation.eulerAngles.y, 0);
-				aimObject = g;
+				if (g.tag == "Player") {
+					playerObject = g;
+				} else {
+					aimObject = g;
+				}
 			}
 		}
 		if (GetComponent<LineRenderer> ().enabled) {
@@ -43,8 +48,13 @@ public class TowerAim : MonoBehaviour {
 			if (cnt > 50) {
 				GetComponent<LineRenderer> ().enabled = true;
 				GetComponent<LineRenderer> ().SetPosition (0, transform.position);
-				GetComponent<LineRenderer> ().SetPosition (1, aimObject.transform.position);
-				aimObject.GetComponent<EnemyMovement> ().hit ();
+				if (playerObject == null) {
+					GetComponent<LineRenderer> ().SetPosition (1, aimObject.transform.position);
+					aimObject.GetComponent<EnemyMovement> ().hit ();
+				} else {
+					GetComponent<LineRenderer> ().SetPosition (1, playerObject.transform.position);
+					playerObject.GetComponent<gunAim> ().hit ();
+				}
 				cnt = 0;
 			}
 		}
