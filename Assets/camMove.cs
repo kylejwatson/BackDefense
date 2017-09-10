@@ -30,10 +30,11 @@ public class camMove : MonoBehaviour {
 	Text gText;
 	[SerializeField]
 	Text wText;
+
+	GameObject curTower;
 	public ArrayList positions = new ArrayList();
 	ArrayList checkedPositions = new ArrayList();
 	float deltaTime = 0.0f;
-	GameObject curTower;
 
 	public float minx;
 	public float minz;
@@ -151,9 +152,9 @@ public class camMove : MonoBehaviour {
 		} else if (Input.mousePosition.y > Screen.height) {
 			Camera.main.transform.Translate (Vector3.up/2);
 		}
-		if (Input.GetAxis ("WpnChange") < 0F) {
+		if (Input.GetAxis ("Zoom") < 0F) {
 			transform.Translate (Vector3.back);
-		} else if (Input.GetAxis ("WpnChange") > 0F) {
+		} else if (Input.GetAxis ("Zoom") > 0F) {
 			transform.Translate (Vector3.forward);
 		}
 	}
