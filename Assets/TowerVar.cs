@@ -10,10 +10,11 @@ public class TowerVar : MonoBehaviour {
 	public GameObject img;
 	public Vector3 pos;
 	public GameObject text;
-	GameObject textOnCanvas;
+	public GameObject textOnCanvas;
+	public int quantitySesh;
 	// Use this for initialization
 	void Start () {
-		placeOnCanvas (100, 100);
+		//placeOnCanvas (100, 100);
 	}
 
 	public void placeOnCanvas (float x, float y){
@@ -30,12 +31,12 @@ public class TowerVar : MonoBehaviour {
 		i.transform.SetParent (main.transform, false);
 		pos = new Vector3 (x, y+74, 0);
 		i.transform.position = pos;
-		i.GetComponentsInChildren<Text> () [0].text = quantity.ToString();
+		i.GetComponentsInChildren<Text> () [0].text = quantitySesh.ToString();
 		textOnCanvas = i;
 	}
 	public void placed(){
-		quantity--;
-		textOnCanvas.GetComponentsInChildren<Text> () [0].text = quantity.ToString();
+		quantitySesh--;
+		textOnCanvas.GetComponentsInChildren<Text> () [0].text = quantitySesh.ToString();
 	}
 	// Update is called once per frame
 	void Update () {

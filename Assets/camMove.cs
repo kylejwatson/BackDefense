@@ -9,6 +9,7 @@ public class camMove : MonoBehaviour {
 	public GameObject otherCam;
 	public Text fpsText;
 	public List<GameObject> towers;
+	public GameObject selector;
 
 	GameObject curTowerGood;
 	GameObject curTowerBad;
@@ -30,12 +31,19 @@ public class camMove : MonoBehaviour {
 		maxx = Mathf.Max (goal.transform.position.x, spawner.transform.position.x);
 		maxz = Mathf.Max (goal.transform.position.z, spawner.transform.position.z);
 		curTower = 0;
+		int cnt = 0;
+		foreach (GameObject t in towers) {
+			cnt++;
+			t.GetComponent<TowerVar> ().quantitySesh = t.GetComponent<TowerVar> ().quantity;
+			t.GetComponent<TowerVar> ().placeOnCanvas (cnt * 110 - 40, 60f);
+		}
 		changeTower (0);
 	}
 
 	void changeTower(int i){
 		if (curTower + i > -1 && curTower + i < towers.Count) {
 			curTower += i;
+			selector.transform.position = towers [curTower].GetComponent<TowerVar> ().textOnCanvas.transform.position;
 			Destroy (curTowerBad);
 			Destroy (curTowerGood);
 			curTowerGood = Instantiate (towers [curTower].GetComponent<TowerVar> ().towerFrameGood);
@@ -109,16 +117,17 @@ public class camMove : MonoBehaviour {
 					canPlace = false;
 				} 
 			}
-			if (Input.GetButtonDown ("Fire1") && canPlace && towers[curTower].GetComponent<TowerVar>().quantity > 0) {
+			if (Input.GetButtonDown ("Fire1") && canPlace && towers[curTower].GetComponent<TowerVar>().quantitySesh > 0) {
 				positions.Add (curTowerGood.transform.position);
 				GameObject newTower = Instantiate (towers[curTower], curTowerGood.transform.position, Quaternion.identity);
+
 				newTower.SetActive (true);
 				towers[curTower].GetComponent<TowerVar>().placed();
 
 			}
-			if (Input.GetAxisRaw ("Change Tower") > 0) {
+			if (Input.GetAxis ("Change Tower") > 0) {
 				changeTower (1);
-			} else if (Input.GetAxisRaw ("Change Tower") < 0) {
+			} else if (Input.GetAxis ("Change Tower") < 0) {
 				changeTower (-1);
 			}
 
